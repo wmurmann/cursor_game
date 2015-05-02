@@ -10,7 +10,7 @@ var bcrypt = require('bcrypt');
 var server = app.listen(1337,function(){console.log('ready on port 1337');});
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
-//var io = require('socket.io')(server);
+var io = require('socket.io')(server);
 
 //sets up mongoose to talk to the pr2 database on th mongo server
 //in order to run this code you must have a mongo server running globally on your computer
@@ -24,6 +24,8 @@ app.use(express.static(__dirname + "/static"));
 app.use(express.static(__dirname + "/bower_components"));
 app.use(bodyParser());
 app.use(cookieParser());
+
+
 
 
 
@@ -41,7 +43,11 @@ var user_schema = new Schema(
 	});
 var USER   = mongoose.model('users',user_schema);
 
-
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.get('/',function (req,res) {
 	if(req.cookies.email !== undefined)
@@ -193,4 +199,15 @@ app.post('/login', function (req,res){
 		res.send("empty");
 		return;
 	}
+});
+
+//socket modules
+io.sockets.on('connection', function(socket){ 
+	socket.on('send_mouse_position', function(req) {  
+		console.log(express.sid);
+		socket.broadcast.emit('new_positions', req);
+	});
+	socket.on('disconnected', function() {
+        socket.emit('remove_player', person_name);
+    });
 });

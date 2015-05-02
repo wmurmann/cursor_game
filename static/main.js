@@ -1,4 +1,70 @@
+var socket = io.connect();
 $( document ).ready(function() {
+	
+
+	var gamePlay = (function (){
+		var mouseX, mouseY;
+        var players = [];
+
+
+        var init = function(){
+			$(document).mousemove(function(e) {
+			    send_mouse_position(e.pageX,e.pageY);
+			}).mouseover();  
+			socket.on('new_positions', function(coordinates){
+            	show_player(coordinates);
+        	});  
+        	socket.on('remove_player', function(coordinates){
+            	remove_player(coordinates);
+        	}); 
+        };
+        var send_mouse_position = function(x,y) {
+        	coordinates = {"x":x, "y":y, "email": readCookie('email')};
+        	socket.emit('send_mouse_position', coordinates);
+        };
+        var show_player = function(coordinates) {
+        	coordinates.email = coordinates.email.replace("%40",".");
+        	var index = $.inArray( coordinates.email, players)
+        	if(index > -1)
+        	{
+        		$("#"+index).css({"top": coordinates.y, "left": coordinates.x});
+        		$("#"+index).show();
+        	}
+        	else
+        	{
+        		players.push(coordinates.email);
+        		$("#"+index).css({"top": coordinates.y, "left": coordinates.x});
+        	}
+        };
+        //cookie manipulation code from http://www.quirksmode.org/js/cookies.html
+        //author:  Scott Andrew
+        var createCookie = function(name,value,days) {
+			if (days) {
+				var date = new Date();
+				date.setTime(date.getTime()+(days*24*60*60*1000));
+				var expires = "; expires="+date.toGMTString();
+			}
+			else var expires = "";
+			document.cookie = name+"="+value+expires+"; path=/";
+		}
+        var readCookie = function(name) {
+			var nameEQ = name + "=";
+			var ca = document.cookie.split(';');
+			for(var i=0;i < ca.length;i++) {
+				var c = ca[i];
+				while (c.charAt(0)==' ') c = c.substring(1,c.length);
+				if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+			}
+			return null;
+		}
+		var eraseCookie = function(name) {
+			createCookie(name,"",-1);
+		}
+        return {
+        	init: init
+        };
+    })();
+	
 	var credentials = (function (){
         var submit_register = $("#submit_register");
         var submit_login = $("#submit_login");
@@ -34,7 +100,7 @@ $( document ).ready(function() {
 					email:$("#email").val(),
 					pass:$("#password").val()
 				},
-				url: "http://localhost:1337/register",
+				url: "http://192.168.0.24:1337/register",
 				success: function (response)
 				{
 					if(response == "success")
@@ -43,7 +109,7 @@ $( document ).ready(function() {
 						$("#email").addClass("has-success");
 						$("#password").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://localhost:1337/cursor_game";
+							window.location.href = "http://192.168.0.24:1337/cursor_game";
 						}, 1500);
 					}
 					else if(response == "taken")
@@ -76,7 +142,7 @@ $( document ).ready(function() {
 					email:$("#email_login").val(),
 					pass:$("#password_login").val()
 				},
-				url: "http://localhost:1337/login",
+				url: "http://192.168.0.24:1337/login",
 				success: function (response)
 				{
 					if(response == "valid")
@@ -85,7 +151,7 @@ $( document ).ready(function() {
 						$("#email_login").addClass("has-success");
 						$("#password_login").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://localhost:1337/cursor_game";
+							window.location.href = "http://192.168.0.24:1337/cursor_game";
 						}, 1500);
 					}
 					else if(response == "invalid")
@@ -128,5 +194,11 @@ $( document ).ready(function() {
         	init: init
         };
     })();
+    
+
     credentials.init();
+    if(window.location.pathname == "/cursor_game")
+    {
+    	gamePlay.init();
+    }
 });

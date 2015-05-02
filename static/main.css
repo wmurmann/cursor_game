@@ -35,3 +35,16 @@
 {
 	color:#A94442;
 }
+.player
+{
+	position: absolute;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px; 
+	background-color: red;
+	display: none;
+}
+.visible
+{
+	display: block;
+}
