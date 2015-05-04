@@ -1,22 +1,116 @@
 var socket = io.connect();
 $( document ).ready(function() {
-	
-
 	var gamePlay = (function (){
 		var mouseX, mouseY;
         var players = [];
-
+        var score = 0;
 
         var init = function(){
-			$(document).mousemove(function(e) {
+        	if($('.game_timer'))
+        	{
+        		$('.game_timer').TimeCircles({
+        			"start":true,
+        		 	"count_past_zero": false,
+        		 	"time": {
+				        "Days": {
+				            "text": "Days",
+				            "color": "#40484F",
+				            "show": false
+				        },
+				        "Hours": {
+				            "text": "Hours",
+				            "color": "#40484F",
+				            "show": false
+				        },
+				        "Minutes": {
+				            "text": "Minutes",
+				            "color": "#40484F",
+				            "show": true
+				        },
+				        "Seconds": {
+				            "text": "Seconds",
+				            "color": "#40484F",
+				            "show": true
+				        }
+				    },
+				    "animation": "ticks",
+				    "bg_width": 0.25,
+				    "fg_width": 0.08,
+				    "circle_bg_color": "#005DFF"
+        		}).addListener(function(unit, amount, total){
+					if(total == 0) 
+					{
+						clear_score();
+					}
+				});
+        	}
+
+			$("#game_board").mousemove(function(e) {
 			    send_mouse_position(e.pageX,e.pageY);
 			}).mouseover();  
 			socket.on('new_positions', function(coordinates){
             	show_player(coordinates);
         	});  
-        	socket.on('remove_player', function(coordinates){
-            	remove_player(coordinates);
-        	}); 
+        	socket.on('new_game', function(){
+        		resetTimer();
+        	});
+        	$(document).on("click",".player", function(player){
+        		score++;
+        		updateScore(player.target.id);
+        	});
+        	socket.on('decrement_score', function(player){
+        		decrement_score(player.email);
+        	});
+        	// socket.on('remove_player', function(coordinates){
+            // 		remove_player(coordinates);
+        	// });
+        };
+        var clear_score = function () {
+        	players = [];
+        	$.ajax({
+				type:"POST",
+				data: {
+					email:readCookie("email").replace("%40","@"),
+					score: score
+				},
+				url: "http://localhost:1337/clear",
+				success: function (response)
+				{
+					console.log(response);
+					if(response == "top")
+					{
+						$('#modal-body').text("Great game! Your score for this round was " + score + ". That is your new top score!");
+					}
+					else if(response == "clear")
+					{
+						$('#modal-body').text("Great game! Your score for this round was " + score + ".");
+					}
+					else
+					{
+						$('#modal-body').text("Great game! Your score for this round was " + score + ". Sorry but we could not save your score, please re-login");
+					}
+					$('#finished').modal('show');
+					score = 0;
+				},
+				error: function (response)
+				{
+					console.log(response);
+				}
+			});
+        };
+        var decrement_score = function(email) {
+        	if(email == readCookie("email").replace("%40","@"))
+        	{
+        		score--;
+        	}
+        };
+        var updateScore = function(player_id) {
+        	var player_clicked = players[player_id].replace(".","@");
+        	var player = readCookie("email").replace("%40","@");
+        	var clicked = [];
+        	clicked.push(player_clicked);
+        	clicked.push(player);
+        	socket.emit('update_score', clicked);
         };
         var send_mouse_position = function(x,y) {
         	coordinates = {"x":x, "y":y, "email": readCookie('email')};
@@ -100,7 +194,7 @@ $( document ).ready(function() {
 					email:$("#email").val(),
 					pass:$("#password").val()
 				},
-				url: "http://192.168.0.24:1337/register",
+				url: "http://localhost:1337/register",
 				success: function (response)
 				{
 					if(response == "success")
@@ -109,7 +203,7 @@ $( document ).ready(function() {
 						$("#email").addClass("has-success");
 						$("#password").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://192.168.0.24:1337/cursor_game";
+							window.location.href = "http://localhost:1337/cursor_game";
 						}, 1500);
 					}
 					else if(response == "taken")
@@ -142,7 +236,7 @@ $( document ).ready(function() {
 					email:$("#email_login").val(),
 					pass:$("#password_login").val()
 				},
-				url: "http://192.168.0.24:1337/login",
+				url: "http://localhost:1337/login",
 				success: function (response)
 				{
 					if(response == "valid")
@@ -151,7 +245,7 @@ $( document ).ready(function() {
 						$("#email_login").addClass("has-success");
 						$("#password_login").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://192.168.0.24:1337/cursor_game";
+							window.location.href = "http://localhost:1337/cursor_game";
 						}, 1500);
 					}
 					else if(response == "invalid")

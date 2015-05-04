@@ -36,7 +36,8 @@ var user_schema = new Schema(
 		password : String, 
 		pos_x    : String,
 		pos_y    : String,
-		score    : String
+		score    : Number,
+		top_score: Number
 	},
 	{ 
 		collection : 'users' 
@@ -102,7 +103,8 @@ app.post('/register',function (req,res){
 											password : hash, 
 											pos_x    : "-5000px",
 											pos_y    : "-5000px",
-											score    : "0"
+											score    : "0",
+											top_score    : "0"
 							    });
 								user.save(function (err) {
 					                if (err) 
@@ -200,14 +202,90 @@ app.post('/login', function (req,res){
 		return;
 	}
 });
+app.post('/clear', function (req,res){
+	var email = req.body.email;
+	var score = req.body.score;
+	USER.findOneAndUpdate({email:email},{"score": 0}, {new:true}, 
+		function (err,response)
+		{
+			if(err || !response)
+			{
+				res.send(response);
+				return;
+			}
+			else if(response.top_score < score)
+			{
+				USER.findOneAndUpdate({email:email},{"top_score": score}, {new:true}, 
+					function (err,response)
+					{
+						if(err || !response)
+						{
+							res.send("failed");
+							return;
+						}
+						else
+						{
+							res.send("top");
+						}
+					}
+				);
+			}
+			else
+			{
+				res.send("clear");
+			}
+		}
+	);
+});
 
 //socket modules
 io.sockets.on('connection', function(socket){ 
 	socket.on('send_mouse_position', function(req) {  
-		console.log(express.sid);
 		socket.broadcast.emit('new_positions', req);
 	});
-	socket.on('disconnected', function() {
-        socket.emit('remove_player', person_name);
-    });
+	socket.on('update_score', function(req) {  
+		console.log(req);
+		USER.findOneAndUpdate({email:req[0]},{$inc: {"score": -1}}, {new:true}, 
+			function (err,response)
+			{
+				if(err)
+				{
+					console.log(err);
+					res.send("ERROR:Database");
+					return;
+				}
+				if(!response)
+				{
+					console.log(response);
+				}
+				else
+				{
+					console.log(response);
+					socket.broadcast.emit('decrement_score', req[0]);
+				}
+			}
+		);
+		USER.findOneAndUpdate({email:req[1]},{$inc: {"score": 1}}, {new:true}, 
+			function (err,response)
+			{
+				if(err)
+				{
+					console.log(err);
+					res.send("ERROR:Database");
+					return;
+				}
+				if(!response)
+				{
+					console.log('updated');
+				}
+				else
+				{
+					console.log(response);
+				}
+			}
+		);
+	});
+	// socket.on('disconnected', function() {
+ //        socket.emit('remove_player', person_name);
+ //    });
 });
