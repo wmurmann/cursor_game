@@ -6,7 +6,52 @@ $( document ).ready(function() {
         var score = 0;
 
         var init = function(){
-        	if($('.game_timer'))
+        	start_timer();
+        	$("#new_game").click(function (){
+        		new_game();
+        	});
+        	$("#log_out").click(function () {
+        		socket.emit('log_out', readCookie("email").replace("%40","@"));
+        		log_out();
+        	});
+			$("#game_board").mousemove(function(e) {
+			    send_mouse_position(e.pageX,e.pageY);
+			}).mouseover(); 
+			$(document).on("click",".player", function(player){
+        		updateScore(player.target.id);
+        	}); 
+			socket.on('new_positions', function(coordinates){
+            	show_player(coordinates);
+        	});  
+        	socket.on('new_game', function(){
+        		resetTimer();
+        	});
+        	socket.on('decrement_score', function(player){
+        		decrement_score(player.email);
+        	});
+        	socket.on('remove_player', function(email){
+            		remove_player(email);
+        	});
+        };
+        var log_out = function (email) {
+        	eraseCookie("email");
+        	window.location.href = "http://spacechase.tk/";
+        };
+        var remove_player = function(email) {
+        	var index = $.inArray( email, players);
+        	players[index] = "";
+        	$('#'+index).hide();
+        };
+        var new_game = function () {
+        	$('.game_timer').TimeCircles().restart();
+        	$('#finished').modal("hide");
+        	for(var i = 0; i < 100; i++)
+        	{
+        		$("#"+i).removeClass('hide_player');
+        	}
+        };
+        var start_timer = function () {
+	        if($('.game_timer'))
         	{
         		$('.game_timer').TimeCircles({
         			"start":true,
@@ -44,36 +89,20 @@ $( document ).ready(function() {
 					}
 				});
         	}
-
-			$("#game_board").mousemove(function(e) {
-			    send_mouse_position(e.pageX,e.pageY);
-			}).mouseover();  
-			socket.on('new_positions', function(coordinates){
-            	show_player(coordinates);
-        	});  
-        	socket.on('new_game', function(){
-        		resetTimer();
-        	});
-        	$(document).on("click",".player", function(player){
-        		score++;
-        		updateScore(player.target.id);
-        	});
-        	socket.on('decrement_score', function(player){
-        		decrement_score(player.email);
-        	});
-        	// socket.on('remove_player', function(coordinates){
-            // 		remove_player(coordinates);
-        	// });
         };
         var clear_score = function () {
         	players = [];
+        	for(var i = 0; i < 100; i++)
+        	{
+        		$("#"+i).addClass('hide_player');
+        	}
         	$.ajax({
 				type:"POST",
 				data: {
 					email:readCookie("email").replace("%40","@"),
 					score: score
 				},
-				url: "http://localhost:1337/clear",
+				url: "http://spacechase.tk/clear",
 				success: function (response)
 				{
 					console.log(response);
@@ -102,9 +131,12 @@ $( document ).ready(function() {
         	if(email == readCookie("email").replace("%40","@"))
         	{
         		score--;
+        		score.text(score * 10);
         	}
         };
         var updateScore = function(player_id) {
+        	score++;
+        	score.text(score * 10);
         	var player_clicked = players[player_id].replace(".","@");
         	var player = readCookie("email").replace("%40","@");
         	var clicked = [];
@@ -118,7 +150,7 @@ $( document ).ready(function() {
         };
         var show_player = function(coordinates) {
         	coordinates.email = coordinates.email.replace("%40",".");
-        	var index = $.inArray( coordinates.email, players)
+        	var index = $.inArray( coordinates.email, players);
         	if(index > -1)
         	{
         		$("#"+index).css({"top": coordinates.y, "left": coordinates.x});
@@ -194,7 +226,7 @@ $( document ).ready(function() {
 					email:$("#email").val(),
 					pass:$("#password").val()
 				},
-				url: "http://localhost:1337/register",
+				url: "http://spacechase.tk/register",
 				success: function (response)
 				{
 					if(response == "success")
@@ -203,7 +235,7 @@ $( document ).ready(function() {
 						$("#email").addClass("has-success");
 						$("#password").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://localhost:1337/cursor_game";
+							window.location.href = "http://spacechase.tk/cursor_game";
 						}, 1500);
 					}
 					else if(response == "taken")
@@ -236,7 +268,7 @@ $( document ).ready(function() {
 					email:$("#email_login").val(),
 					pass:$("#password_login").val()
 				},
-				url: "http://localhost:1337/login",
+				url: "http://spacechase.tk/login",
 				success: function (response)
 				{
 					if(response == "valid")
@@ -245,7 +277,7 @@ $( document ).ready(function() {
 						$("#email_login").addClass("has-success");
 						$("#password_login").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://localhost:1337/cursor_game";
+							window.location.href = "http://spacechase.tk/cursor_game";
 						}, 1500);
 					}
 					else if(response == "invalid")

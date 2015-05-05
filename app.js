@@ -7,7 +7,7 @@ var validator = require('validator');
 var bcrypt = require('bcrypt');
 
 //set up the node server and pass it to the socket module
-var server = app.listen(1337,function(){console.log('ready on port 1337');});
+var server = app.listen(8000,function(){console.log('ready on port 1337');});
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 var io = require('socket.io')(server);
@@ -44,6 +44,8 @@ var user_schema = new Schema(
 	});
 var USER   = mongoose.model('users',user_schema);
 
+
+//temporary fix xss warning
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -285,7 +287,7 @@ io.sockets.on('connection', function(socket){
 			}
 		);
 	});
-	// socket.on('disconnected', function() {
- //        socket.emit('remove_player', person_name);
- //    });
+	socket.on('log_out', function (req) {
+		socket.broadcast.emit('remove_player', req);
+	});
 });
