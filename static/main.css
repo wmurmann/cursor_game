@@ -1,13 +1,93 @@
 html,body
 {
 	height: 100%;
+	min-width: 960px;
 	overflow:hidden;
+ 	background: url("space.png") repeat scroll 0% 0% transparent;
 
+}
+.instructions
+{
+	width: 80%;
+	margin: 5% auto 0px;
+	background: none repeat scroll 0% 0% rgba(199, 131, 240, 0.66);
+	padding: 1px 30px 10px;
+	border-radius: 5px;
+	border: 2px solid #7AFF29;
+	font-family: 'Press Start 2P', serif;
+}
+.instructions h1, .instructions h3
+{
+	text-align: center;
+}
+#register h2, #login h2
+{
+	color: rgba(0, 0, 0, 0.55);
+	font-family: "Press Start 2P",serif;
+	margin-left: -5px;
+	font-size: 27px;
+}
+.instructions p
+{
+	font-family: "Press Start 2P",serif;
+	font-size: 15px;
+	color: #FFF;
+	letter-spacing: -1px;
+	line-height: 1.5;
+	text-indent: 13px;
+	margin-bottom: 20px;
+}
+.instructions table,.instructions table  *
+{
+	border-color: #71F522 !important;
+}
+.table-responsive > .table
+{
+	background: none;
+}
+.instructions .table-striped *
+{
+	color:#fff;
+
+}
+.instructions .table-striped > tbody > tr
+{
+	background: none;
+}
+.modal-body
+{
+	color:#fff;
+}
+.divider
+{
+	width: 100%;
+	height: 1px;
+	background: #000;
+}
+.small_header
+{
+    font-family: "Press Start 2P",serif;
+    color: #000;
+    font-size: 22px;
+    letter-spacing: 0px;
+    display: block;
+    padding: 5px 0px 10px 0px;
+
+}
+.header_shaddow
+{
+	font-family: "Press Start 2P",serif;
+	color: #71F522;
+	text-shadow: -3px 3px #0E0E0E, -3px 2px #3D7E30, -2px 1px #29AE21;
 }
 .center_float
 {
 	width: 500px;
 	margin: 10% auto;
+}
+.center_float label
+{
+	color: rgba(12, 12, 12, 0.77);
 }
 .center_float .help-block
 {
@@ -51,17 +131,14 @@ html,body
 .player
 {
 	position: absolute;
-	border-radius: 50%;
-	width: 20px;
-	height: 20px; 
-	background-color: red;
 	display: none;
-	z-index: 200;
 }
 #score
 {
+	font-family: 'Press Start 2P', serif;
 	text-align: center;
 	font-size: 30px;
+	color:#fff;
 }
 .hide_player
 {
@@ -71,24 +148,88 @@ html,body
 {
 	display: block;
 }
+#finished .modal-footer
+{
+	padding: 0px 10px;
+	font-size: 11px;
+	margin: 0px;
+	width: 448px;
+	height: 55px;
+	border: none;
+	position: relative;
+}
+#finished .modal-footer .btn
+{
+	font-size: 11px;
+}
+#finished .modal-footer .btn-default
+{
+	position: absolute;
+	left: 168px;
+	top: 15px;
+}
+#finished .modal-footer .btn-success
+{
+	position: absolute;
+	left: 0px;
+	top: 15px;
+}
+#finished .modal-footer .btn-primary
+{
+	position: absolute;
+	top: 15px;
+	left: 296px;
+}
+#highscore_table > .modal-dialog
+{
+	width: 860px;
+}
+#highscore_table .instructions
+{
+	width:100%;
+}
 .game_timer_cont
 {
 	position: absolute;
-	top:6px;
-	left:4px;
-	width:200px;
-	border: 2px solid #343434;
+	top: 10px;
+	width: 200px;
+	border: 2px solid #A9E12A;
 	border-radius: 12px;
+	right: 10px;
+	margin: 0px;
+	padding: 10px 0px;
 }
 .game_timer_cont h3
 {
 	text-align: center;
-	margin: 5px 0 0 0;
+	margin: 5px 0px 0px;
+	color: rgb(113, 245, 34);
+	font-family: "Press Start 2P",Arial;
+	font-size: 22px;
+	letter-spacing: -1px;
+}
+.center_button
+{
+	margin: 0 auto 10px auto;
+	display: block;
 }
 .game_timer
 {
 	width: 200px;
 	height: 100px;
+}
+.log_out.timer 
+{
+	color:#D500FF;
+	font-size: 23px;
+	text-align: center;
+	display: block;
+
+	font-family: 'Press Start 2P', Arial;
+}
+.log_out.timer:hover
+{
+	text-decoration: underline;
 }
 .asteroid
 {
@@ -152,3 +293,50 @@ html,body
    from { background-position:    0px; }
      to { background-position: -1368px; }
 }
+.enemy.red
+{
+	 background-image: url("/enemy_red.png");
+}
+.enemy.green
+{
+	 background-image: url("/enemy_green.png");
+}
+.enemy.purple
+{
+	 background-image: url("/enemy_purple.png");
+}
+.enemy {
+    width: 40px;
+    height: 30px;
+    background-image: url("/enemy_purple.png");
+    
+    -webkit-animation: en .5s steps(4) infinite;
+       -moz-animation: en .5s steps(4) infinite;
+        -ms-animation: en .5s steps(4) infinite;
+         -o-animation: en .5s steps(4) infinite;
+            animation: en .5s steps(4) infinite;
+}
+
+@-webkit-keyframes en {
+   from { background-position:    0px; }
+     to { background-position: -160px; }
+}
+
+@-moz-keyframes en {
+   from { background-position:    0px; }
+     to { background-position: -160px; }
+}
+
+@-ms-keyframes en {
+   from { background-position:    0px; }
+     to { background-position: -160px; }
+}
+
+@-o-keyframes en {
+   from { background-position:    0px; }
+     to { background-position: -160px; }
+}
+
+@keyframes en {
+   from { background-position:    0px; }
+     to { background-position: -160px

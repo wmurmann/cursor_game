@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+
+<head>
+	<!--[if lt IE 9]>
+	    <script src="bower_components/html5shiv/dist/html5shiv.js"></script>
+	<![endif]-->
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Press+Start+2P">
+	<link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="main.css">
+	<title>Cusor Game</title>
+</head>
+<body>
+	<div class="instructions">
+		<h1 class="header_shaddow">Instructions</h1>
+		<p>The objective of Space Chase is to obtain the most points by clicking the flying saucers before the clock runs out. Each alien space ship is actualy another opponets cursor with the same objective. If they click your cursor your score will decrease, so make sure to keep it moving! There are also asteroids moving throughout the game feild that must avoid or your score will decrease. Below are images of the games ojects.</p>
+		
+		<div class="table-responsive">
+		    <table class="table table-bordered table-striped bs-events-table">
+		      <thead>
+		       <tr>
+		         <th>Object</th>
+		         <th>Action</th>
+		         <th>Score</th>
+		       </tr>
+		      </thead>
+			<tbody>
+				<tr>
+					<td><div class="asteroid" style="display:block; position:relative;"></div></td>
+					<td>Hits You</td>
+					<td>-10 points</td>
+				</tr>
+				<tr>
+					<td><div class="player enemy red" style="display:block; position:relative;"></div></td>
+					<td>You Click Opponent</td>
+					<td>+10 points.</td>
+				</tr>
+				<tr>
+					<td><div class="player enemy purple" style="display:block; position:relative;"></div></td>
+					<td>Opponent Clicks You</td>
+					<td>-10 points</td>
+				</tr>
+			</tbody>
+		    </table>
+  		</div>
+  		<button onclick="window.location.href = '/cursor_game';" class="btn btn-default center_button">Start Game</button>
+
+	</div>
+</body>
+<script src="jquery/dist/jquery.js"></script>
+<script src="bootstrap/dist/js/bootstrap.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="main.js"></script>
+</html>

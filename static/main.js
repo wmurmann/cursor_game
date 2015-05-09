@@ -4,15 +4,28 @@ $( document ).ready(function() {
 		var mouseX, mouseY;
         var players = [];
         var score = 0;
-        var stop_asteroids = true;
+        var stop_asteroids = false;
 
         var init = function(){
         	start_timer();
 			start_asteroids();
         	$("#new_game").click(function (){
-        		new_game();
+        		$('#finished').modal("hide");
         	});
-        	$("#log_out").click(function () {
+        	$("#finished").on('hidden.bs.modal', function () {
+			    new_game();
+			});
+			$("#highscore_table").on('hidden.bs.modal', function () {
+			    new_game();
+			});
+			$(".highscore").on("click", function () {
+				high_scores();
+				if($("#finished").is(":visible"))
+				{
+					$('#finished').hide();
+				}
+			});
+        	$(".log_out").click(function () {
         		socket.emit('log_out', readCookie("email").replace("%40","@"));
         		log_out();
         	});
@@ -23,8 +36,7 @@ $( document ).ready(function() {
         		updateScore(player.target.id);
         	});
 			$(".asteroid").mouseover(function() {
-				score--;
-				$("#score").text(score * 10);
+				decrease_score_color();
 			});
 			socket.on('new_positions', function(coordinates){
             	show_player(coordinates);
@@ -159,19 +171,20 @@ $( document ).ready(function() {
 				        },
 				        "Minutes": {
 				            "text": "Minutes",
-				            "color": "#40484F",
+				            "color": "rgb(249,47,8)",
 				            "show": true
 				        },
 				        "Seconds": {
 				            "text": "Seconds",
-				            "color": "#40484F",
+				            "font": "Press Start 2P",
+				            "color": "rgb(249,47,8)",
 				            "show": true
 				        }
 				    },
 				    "animation": "ticks",
 				    "bg_width": 0.25,
 				    "fg_width": 0.08,
-				    "circle_bg_color": "#005DFF"
+				    "circle_bg_color": "rgb(60, 60, 60)"
         		}).addListener(function(unit, amount, total){
 					if(total == 0) 
 					{
@@ -221,13 +234,30 @@ $( document ).ready(function() {
         var decrement_score = function(email) {
         	if(email == readCookie("email").replace("%40","@"))
         	{
-        		score--;
-        		$("#score").text(score * 10);
+        		decrease_score_color();
         	}
         };
-        var updateScore = function(player_id) {
+        var increase_score_color = function()
+        {
+        	$("#score").stop().css({"color":"#71F522"},function(){
+	        	setTimeout(function () {
+	        		$("#score").css({"color":"rgb(245,245,245)"});
+	    		}, 250);
+        	});
         	score++;
         	$("#score").text(score * 10);
+        };
+        var decrease_score_color = function()
+        {
+        	$("#score").css({"color":"rgb(249,47,8)"});
+        	setTimeout(function () {
+        		$("#score").css({"color":"rgb(245,245,245)"});
+    		}, 250);
+        	score--;
+        	$("#score").text(score * 10);
+        };
+        var updateScore = function(player_id) {
+			increase_score_color();
         	var player_clicked = players[player_id].replace(".","@");
         	var player = readCookie("email").replace("%40","@");
         	var clicked = [];
@@ -252,6 +282,33 @@ $( document ).ready(function() {
         		players.push(coordinates.email);
         		$("#"+index).css({"top": coordinates.y, "left": coordinates.x});
         	}
+        };
+        var high_scores = function() {
+        	$("#highscore_table").modal("show");
+        	$.ajax({
+				type:"POST",
+				url: "http://localhost:1337/highscore",
+				success: function (users)
+				{
+					try
+					{
+						users[0].email;
+					}
+					catch(e)
+					{
+						return;
+					}
+					for(var i = 0; i < users.length; i++)
+					{
+						$("#high_score_list").children('tr').eq(i).children('td').eq(1).text(users[i].email);
+						$("#high_score_list").children('tr').eq(i).children('td').eq(2).text(users[i].top_score);
+					}
+				},
+				error: function (response)
+				{
+					console.log(response);
+				}
+			});
         };
         //cookie manipulation code from http://www.quirksmode.org/js/cookies.html
         //author:  Scott Andrew
@@ -289,6 +346,7 @@ $( document ).ready(function() {
         var log_link = $("#login_link");
 
         var init = function(){
+        	$('#credentials').modal("show");
         	submit_register.on("click",function(e){
         		e.preventDefault();
         		register();
@@ -326,7 +384,7 @@ $( document ).ready(function() {
 						$("#email").addClass("has-success");
 						$("#password").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://localhost:1337/cursor_game";
+							window.location.href = "http://localhost:1337/walkthrough";
 						}, 1500);
 					}
 					else if(response == "taken")

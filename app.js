@@ -57,6 +57,16 @@ app.get('/',function (req,res) {
 	    res.render("credentials");
 	}
 });
+app.get('/walkthrough',function (req,res) {
+	if(req.cookies.email !== undefined)
+	{
+		res.render("walkthrough");	
+	}
+	else
+	{
+	    res.redirect("/");
+	}
+});
 app.get('/cursor_game',function (req,res) {
 	if(req.cookies.email !== undefined)
 	{
@@ -235,7 +245,22 @@ app.post('/clear', function (req,res){
 		}
 	);
 });
-
+app.post('/highscore', function (req,res){
+	USER.find({}, 'email top_score', {sort: {top_score : -1}, limit:10}, function(err, users) {
+		if (err) 
+		{
+			res.send("err")
+		}
+		if(!users.length)
+		{
+			res.send("none");
+		}
+		else
+		{
+			res.send(users);
+		}
+	});
+});
 //socket modules
 io.sockets.on('connection', function(socket){ 
 
