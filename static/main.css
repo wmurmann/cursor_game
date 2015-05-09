@@ -1,6 +1,7 @@
 html,body
 {
 	height: 100%;
+	overflow:hidden;
 
 }
 .center_float
@@ -88,4 +89,66 @@ html,body
 {
 	width: 200px;
 	height: 100px;
+}
+.asteroid
+{
+	background: url('/asteroid1.png') 0 0;
+	position: absolute;
+	display: none;
+}
+.comet
+{
+	position: absolute;
+	border-radius: 50%;
+	width: 75px;
+	height: 75px; 
+	background-color: brown;
+	display: none;
+	z-index: 200;
+}
+.satalite
+{
+	position: absolute;
+	border-radius: 50%;
+	width: 100px;
+	height: 100px; 
+	background-color: brown;
+	display: none;
+	z-index: 200;
+}
+.asteroid {
+    width: 72px;
+    height: 72px;
+    background-image: url("/asteroids.png");
+    
+    -webkit-animation: play .5s steps(19) infinite;
+       -moz-animation: play .5s steps(19) infinite;
+        -ms-animation: play .5s steps(19) infinite;
+         -o-animation: play .5s steps(19) infinite;
+            animation: play .5s steps(19) infinite;
+}
+
+@-webkit-keyframes play {
+   from { background-position:    0px; }
+     to { background-position: -1368px; }
+}
+
+@-moz-keyframes play {
+   from { background-position:    0px; }
+     to { background-position: -1368px; }
+}
+
+@-ms-keyframes play {
+   from { background-position:    0px; }
+     to { background-position: -1368px; }
+}
+
+@-o-keyframes play {
+   from { background-position:    0px; }
+     to { background-position: -1368px; }
+}
+
+@keyframes play {
+   from { background-position:    0px; }
+     to { background-position: -1368px; }
 }

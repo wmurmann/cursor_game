@@ -4,9 +4,11 @@ $( document ).ready(function() {
 		var mouseX, mouseY;
         var players = [];
         var score = 0;
+        var stop_asteroids = true;
 
         var init = function(){
         	start_timer();
+			start_asteroids();
         	$("#new_game").click(function (){
         		new_game();
         	});
@@ -19,7 +21,11 @@ $( document ).ready(function() {
 			}).mouseover(); 
 			$(document).on("click",".player", function(player){
         		updateScore(player.target.id);
-        	}); 
+        	});
+			$(".asteroid").mouseover(function() {
+				score--;
+				$("#score").text(score * 10);
+			});
 			socket.on('new_positions', function(coordinates){
             	show_player(coordinates);
         	});  
@@ -27,15 +33,98 @@ $( document ).ready(function() {
         		resetTimer();
         	});
         	socket.on('decrement_score', function(player){
-        		decrement_score(player.email);
+        		decrement_score(player);
         	});
         	socket.on('remove_player', function(email){
-            		remove_player(email);
+            	remove_player(email);
+        	});
+        	socket.on('disconnect', function(email){
+        		console.log('4'+email);
+        		remove_player(email);
+    			if(email == readCookie("email"))
+    			{
+    				eraseCookie("email");
+    			}
         	});
         };
+        var move_asteroid = function(asteroid)
+        {
+        	if(!stop_asteroids)
+        	{
+        		coordinates = rand_spots();
+	        	asteroid.css({"top": coordinates.start_y, "left": coordinates.start_x});
+	        	asteroid.show();
+	        	asteroid.animate({top: coordinates.target_y, left: coordinates.target_x}
+	        		,Math.random() * (5000 - 2000) + 2000, 
+	        		function(){
+		        		asteroid.hide(function(){
+		        			move_asteroid(asteroid);
+		        		});
+	        	});
+        	}
+        };
+        var start_asteroids = function()
+        {
+        	stop_asteroids = false;
+        	setTimeout(move_asteroid($("#a1")), 500);
+        	setTimeout(move_asteroid($("#a2")), 750);
+        	setTimeout(move_asteroid($("#a3")), 1000);
+        	setTimeout(move_asteroid($("#a4")), 1250);
+        	setTimeout(move_asteroid($("#a5")), 1500);
+        };
+        var rand_spots = function()
+       	{
+       		var sides = [1,2,3,4],spots = {},
+			start_side = sides.splice(Math.random()*sides.length,1),
+			stop_side = sides.splice(Math.random()*sides.length,1);
+
+			for(var i = 0; i < 2; i++)
+			{
+				var x,y;
+				if(i == 0)
+				{
+					var side = start_side;
+				}
+				else
+				{
+					var side = stop_side;
+				}
+				if(side == 1)
+				{
+					x = Math.random() * ($(window).width() - 0) + 0;
+					y = -72;
+				}
+				else if(side == 2)
+				{
+					x = $(window).width() + 72;
+				    y = Math.random() * ($(window).height() - 0) + 0;
+				}
+				else if(side == 3)
+				{
+					x = Math.random() * ($(window).width() - 0) + 0;
+				    y = $(window).height() + 72;
+				}
+				else
+				{
+					x = -72;
+					y = Math.random() * ($(window).height() - 0) + 0;
+				}
+				if(i == 0)
+				{
+					spots.start_x = x + "px";
+					spots.start_y = y + "px";
+				}
+				else
+				{
+					spots.target_x = x + "px";
+					spots.target_y = y + "px";
+				}
+			}
+			return spots;
+       	};
         var log_out = function (email) {
         	eraseCookie("email");
-        	window.location.href = "http://spacechase.tk/";
+        	window.location.href = "http://localhost:1337/";
         };
         var remove_player = function(email) {
         	var index = $.inArray( email, players);
@@ -49,6 +138,7 @@ $( document ).ready(function() {
         	{
         		$("#"+i).removeClass('hide_player');
         	}
+        	start_asteroids();
         };
         var start_timer = function () {
 	        if($('.game_timer'))
@@ -86,6 +176,7 @@ $( document ).ready(function() {
 					if(total == 0) 
 					{
 						clear_score();
+						stop_asteroids = true;
 					}
 				});
         	}
@@ -102,21 +193,21 @@ $( document ).ready(function() {
 					email:readCookie("email").replace("%40","@"),
 					score: score
 				},
-				url: "http://spacechase.tk/clear",
+				url: "http://localhost:1337/clear",
 				success: function (response)
 				{
 					console.log(response);
 					if(response == "top")
 					{
-						$('#modal-body').text("Great game! Your score for this round was " + score + ". That is your new top score!");
+						$('#modal-body').text("Great game! Your score for this round was " + score*10 + ". That is your new top score!");
 					}
 					else if(response == "clear")
 					{
-						$('#modal-body').text("Great game! Your score for this round was " + score + ".");
+						$('#modal-body').text("Great game! Your score for this round was " + score*10 + ".");
 					}
 					else
 					{
-						$('#modal-body').text("Great game! Your score for this round was " + score + ". Sorry but we could not save your score, please re-login");
+						$('#modal-body').text("Great game! Your score for this round was " + score*10 + ". Sorry but we could not save your score, please re-login");
 					}
 					$('#finished').modal('show');
 					score = 0;
@@ -131,12 +222,12 @@ $( document ).ready(function() {
         	if(email == readCookie("email").replace("%40","@"))
         	{
         		score--;
-        		score.text(score * 10);
+        		$("#score").text(score * 10);
         	}
         };
         var updateScore = function(player_id) {
         	score++;
-        	score.text(score * 10);
+        	$("#score").text(score * 10);
         	var player_clicked = players[player_id].replace(".","@");
         	var player = readCookie("email").replace("%40","@");
         	var clicked = [];
@@ -226,7 +317,7 @@ $( document ).ready(function() {
 					email:$("#email").val(),
 					pass:$("#password").val()
 				},
-				url: "http://spacechase.tk/register",
+				url: "http://localhost:1337/register",
 				success: function (response)
 				{
 					if(response == "success")
@@ -235,7 +326,7 @@ $( document ).ready(function() {
 						$("#email").addClass("has-success");
 						$("#password").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://spacechase.tk/cursor_game";
+							window.location.href = "http://localhost:1337/cursor_game";
 						}, 1500);
 					}
 					else if(response == "taken")
@@ -268,7 +359,7 @@ $( document ).ready(function() {
 					email:$("#email_login").val(),
 					pass:$("#password_login").val()
 				},
-				url: "http://spacechase.tk/login",
+				url: "http://localhost:1337/login",
 				success: function (response)
 				{
 					if(response == "valid")
@@ -277,7 +368,7 @@ $( document ).ready(function() {
 						$("#email_login").addClass("has-success");
 						$("#password_login").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://spacechase.tk/cursor_game";
+							window.location.href = "http://localhost:1337/cursor_game";
 						}, 1500);
 					}
 					else if(response == "invalid")

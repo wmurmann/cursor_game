@@ -7,7 +7,7 @@ var validator = require('validator');
 var bcrypt = require('bcrypt');
 
 //set up the node server and pass it to the socket module
-var server = app.listen(8000,function(){console.log('ready on port 1337');});
+var server = app.listen(1337,function(){console.log('ready on port 1337');});
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 var io = require('socket.io')(server);
@@ -25,10 +25,6 @@ app.use(express.static(__dirname + "/bower_components"));
 app.use(bodyParser());
 app.use(cookieParser());
 
-
-
-
-
 //schema to insert/update/delete a user document in the pr2 database under the users collection
 var user_schema = new Schema(
 	{ 
@@ -44,14 +40,13 @@ var user_schema = new Schema(
 	});
 var USER   = mongoose.model('users',user_schema);
 
-
 //temporary fix xss warning
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
-
+//page rendering
 app.get('/',function (req,res) {
 	if(req.cookies.email !== undefined)
 	{
@@ -72,6 +67,7 @@ app.get('/cursor_game',function (req,res) {
 	    res.redirect("/");
 	}
 });
+//credentials
 app.post('/register',function (req,res){
 	var user_email    = validator.trim(req.body.email);
 	var user_password = validator.trim(req.body.pass);
@@ -242,9 +238,11 @@ app.post('/clear', function (req,res){
 
 //socket modules
 io.sockets.on('connection', function(socket){ 
+
 	socket.on('send_mouse_position', function(req) {  
 		socket.broadcast.emit('new_positions', req);
 	});
+	//update scores from click events
 	socket.on('update_score', function(req) {  
 		console.log(req);
 		USER.findOneAndUpdate({email:req[0]},{$inc: {"score": -1}}, {new:true}, 
@@ -287,6 +285,7 @@ io.sockets.on('connection', function(socket){
 			}
 		);
 	});
+	//logs user out of system
 	socket.on('log_out', function (req) {
 		socket.broadcast.emit('remove_player', req);
 	});
