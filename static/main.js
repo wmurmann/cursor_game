@@ -136,7 +136,7 @@ $( document ).ready(function() {
        	};
         var log_out = function (email) {
         	eraseCookie("email");
-        	window.location.href = "http://localhost:1337/";
+        	window.location.href = "http://spacechase.tk/";
         };
         var remove_player = function(email) {
         	var index = $.inArray( email, players);
@@ -206,7 +206,7 @@ $( document ).ready(function() {
 					email:readCookie("email").replace("%40","@"),
 					score: score
 				},
-				url: "http://localhost:1337/clear",
+				url: "http://spacechase.tk/clear",
 				success: function (response)
 				{
 					console.log(response);
@@ -287,7 +287,7 @@ $( document ).ready(function() {
         	$("#highscore_table").modal("show");
         	$.ajax({
 				type:"POST",
-				url: "http://localhost:1337/highscore",
+				url: "http://spacechase.tk/highscore",
 				success: function (users)
 				{
 					try
@@ -375,7 +375,7 @@ $( document ).ready(function() {
 					email:$("#email").val(),
 					pass:$("#password").val()
 				},
-				url: "http://localhost:1337/register",
+				url: "http://spacechase.tk/register",
 				success: function (response)
 				{
 					if(response == "success")
@@ -384,7 +384,7 @@ $( document ).ready(function() {
 						$("#email").addClass("has-success");
 						$("#password").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://localhost:1337/walkthrough";
+							window.location.href = "http://spacechase.tk/walkthrough";
 						}, 1500);
 					}
 					else if(response == "taken")
@@ -417,7 +417,7 @@ $( document ).ready(function() {
 					email:$("#email_login").val(),
 					pass:$("#password_login").val()
 				},
-				url: "http://localhost:1337/login",
+				url: "http://spacechase.tk/login",
 				success: function (response)
 				{
 					if(response == "valid")
@@ -426,7 +426,7 @@ $( document ).ready(function() {
 						$("#email_login").addClass("has-success");
 						$("#password_login").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://localhost:1337/cursor_game";
+							window.location.href = "http://spacechase.tk/cursor_game";
 						}, 1500);
 					}
 					else if(response == "invalid")

@@ -7,7 +7,7 @@ var validator = require('validator');
 var bcrypt = require('bcrypt');
 
 //set up the node server and pass it to the socket module
-var server = app.listen(1337,function(){console.log('ready on port 1337');});
+var server = app.listen(8000,function(){console.log('ready on port 1337');});
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 var io = require('socket.io')(server);
