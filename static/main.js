@@ -55,15 +55,16 @@ $( document ).ready(function() {
             	remove_player(email);
         	});
         };
+    		
         var move_asteroid = function(asteroid)
         {
         	if(!stop_asteroids)
         	{
-        		coordinates = rand_spots();
+        		var coordinates = rand_spots();
 	        	asteroid.css({"top": coordinates.start_y, "left": coordinates.start_x});
 	        	asteroid.show();
-	        	asteroid.animate({top: coordinates.target_y, left: coordinates.target_x}
-	        		,Math.random() * (5000 - 2000) + 2000, 
+	        	asteroid.animate({top: coordinates.target_y, left: coordinates.target_x},
+	        		Math.random() * (5000 - 2000) + 2000, 
                 function(){
 		        			asteroid.hide(function(){
 		        			move_asteroid(asteroid);
@@ -264,7 +265,7 @@ $( document ).ready(function() {
         	socket.emit('update_score', clicked);
         };
         var send_mouse_position = function(x,y) {
-        	coordinates = {"x":x, "y":y, "email": readCookie('email')};
+        	var coordinates = {"x":x, "y":y, "email": readCookie('email')};
         	socket.emit('send_mouse_position', coordinates);
         };
         var show_player = function(coordinates) {
@@ -476,3 +477,4 @@ $( document ).ready(function() {
     	gamePlay.init();
     }
 });
+
