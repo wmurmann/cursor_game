@@ -1,4 +1,5 @@
 var socket = io.connect();
+var domain = "spacechase.tk";
 $( document ).ready(function() {
 	var gamePlay = (function (){
 		var mouseX, mouseY;
@@ -27,8 +28,11 @@ $( document ).ready(function() {
 			});
         	$(".log_out").click(function () {
         		socket.emit('log_out', readCookie("email").replace("%40","@"));
-        		log_out();
+        		log_out(false);
         	});
+        	window.onbeforeunload = function(e) {
+				socket.emit('log_out', readCookie("email").replace("%40","@"));
+			};
 			$("#game_board").mousemove(function(e) {
 			    send_mouse_position(e.pageX,e.pageY);
 			}).mouseover(); 
@@ -49,14 +53,6 @@ $( document ).ready(function() {
         	});
         	socket.on('remove_player', function(email){
             	remove_player(email);
-        	});
-        	socket.on('disconnect', function(email){
-        		console.log('4'+email);
-        		remove_player(email);
-    			if(email == readCookie("email"))
-    			{
-    				eraseCookie("email");
-    			}
         	});
         };
         var move_asteroid = function(asteroid)
@@ -134,11 +130,12 @@ $( document ).ready(function() {
 			}
 			return spots;
        	};
-        var log_out = function (email) {
+        var log_out = function (leaving_site) {
         	eraseCookie("email");
-        	window.location.href = "http://spacechase.tk/";
+	        window.location.href = "http://"+domain+"/";
         };
         var remove_player = function(email) {
+        	email = email.replace("@",".");
         	var index = $.inArray( email, players);
         	players[index] = "";
         	$('#'+index).hide();
@@ -206,7 +203,7 @@ $( document ).ready(function() {
 					email:readCookie("email").replace("%40","@"),
 					score: score
 				},
-				url: "http://spacechase.tk/clear",
+				url: "http://"+domain+"/clear",
 				success: function (response)
 				{
 					console.log(response);
@@ -287,7 +284,7 @@ $( document ).ready(function() {
         	$("#highscore_table").modal("show");
         	$.ajax({
 				type:"POST",
-				url: "http://spacechase.tk/highscore",
+				url: "http://"+domain+"/highscore",
 				success: function (users)
 				{
 					try
@@ -375,7 +372,7 @@ $( document ).ready(function() {
 					email:$("#email").val(),
 					pass:$("#password").val()
 				},
-				url: "http://spacechase.tk/register",
+				url: "http://"+domain+"/register",
 				success: function (response)
 				{
 					if(response == "success")
@@ -384,7 +381,7 @@ $( document ).ready(function() {
 						$("#email").addClass("has-success");
 						$("#password").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://spacechase.tk/walkthrough";
+							window.location.href = "http://"+domain+"/walkthrough";
 						}, 1500);
 					}
 					else if(response == "taken")
@@ -417,7 +414,7 @@ $( document ).ready(function() {
 					email:$("#email_login").val(),
 					pass:$("#password_login").val()
 				},
-				url: "http://spacechase.tk/login",
+				url: "http://"+domain+"/login",
 				success: function (response)
 				{
 					if(response == "valid")
@@ -426,7 +423,7 @@ $( document ).ready(function() {
 						$("#email_login").addClass("has-success");
 						$("#password_login").addClass("has-success");
 						setTimeout(function() {
-							window.location.href = "http://spacechase.tk/cursor_game";
+							window.location.href = "http://"+domain+"/cursor_game";
 						}, 1500);
 					}
 					else if(response == "invalid")
