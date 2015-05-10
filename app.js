@@ -31,8 +31,6 @@ app.use(cookieParser());
 var user_schema = new Schema({
     email: String,
     password: String,
-    pos_x: String,
-    pos_y: String,
     score: Number,
     top_score: Number
 }, {
@@ -82,8 +80,7 @@ app.post('/register', function(req, res) {
                     res.send("database");
                     return;
                 } else if (email.length === 0) {
-
-                    bcrypt.genSalt(10, function(err, salt) {
+					bcrypt.genSalt(10, function(err, salt) {
                         bcrypt.hash(user_password, salt, function(err, hash) {
                             if (err) {
                                 console.log(err);
@@ -93,8 +90,6 @@ app.post('/register', function(req, res) {
                                 var user = new USER({
                                     email: user_email,
                                     password: hash,
-                                    pos_x: "-5000px",
-                                    pos_y: "-5000px",
                                     score: "0",
                                     top_score: "0"
                                 });
@@ -115,7 +110,6 @@ app.post('/register', function(req, res) {
                 } else {
                     res.send("taken");
                 }
-
             });
         } else {
             res.send("email");

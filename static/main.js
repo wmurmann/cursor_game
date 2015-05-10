@@ -1,11 +1,7 @@
-// Client-side code
-/* jshint browser: true, jquery: true, curly: true, eqeqeq: true, forin: true, immed: true, indent: 4, latedef: true, newcap: true, nonew: true, quotmark: double, strict: true, undef: true, unused: true
- */
 var socket = io.connect();
 var domain = "localhost:1337";//"spacechase.tk";
 $(document).ready(function() {
     var gamePlay = (function() {
-        var mouseX, mouseY;
         var players = [];
         var score = 0;
         var stop_asteroids = false;
