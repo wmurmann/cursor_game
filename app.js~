@@ -154,7 +154,6 @@ app.post('/register',function (req,res){
 app.post('/login', function (req,res){
 	var user_email    = validator.trim(req.body.email);
 	var user_password = validator.trim(req.body.pass);
-  var password;
 	if(user_email !== "" && user_password !== "")
 	{
 		if(validator.isEmail(user_email))
@@ -172,7 +171,7 @@ app.post('/login', function (req,res){
 					}
 					try 
 					{
-						password = response[0].password;
+						var password = response[0].password;
 					}
 					catch (e) {
 						res.send("invalid");
